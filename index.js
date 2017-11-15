@@ -6,7 +6,7 @@ var app     = express();
 
 app.get('/scrape', function(req, res){
 
-    url = 'http://www.imdb.com/title/tt1229340/';
+    url = 'http://www.nieuwsblad.be/cnt/dmf20171115_03187817';
 
     request(url, function(error, response, html){
         if(!error){
