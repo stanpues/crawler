@@ -3,62 +3,66 @@ var fs = require('fs');
 var request = require('request');
 var cheerio = require('cheerio');
 var app     = express();
+var basicAuth = require('express-basic-auth');
+const url = 'http://www.nieuwsblad.be/cnt/dmf20171115_03189094';
 
 app.get('/scrape', function(req, res){
 
-    url = 'http://www.nieuwsblad.be/cnt/dmf20171115_03187817';
+    
 
     request(url, function(error, response, html){
         if(!error){
-            var $ = cheerio.load(html);
+            const $ = cheerio.load(html);
 
             mycont = $('script');
 
-            my_result = mycont;
+            const parts = /article_externalid:"([^"]*)/g.exec(mycont);
+            const myid = parts[1];
 
-        /* 
-            var title, release, rating;
-            var json = { title : "", release : "", rating : ""};
-  
-            $('.header').filter(function(){
-                var data = $(this);
-                title = data.children().first().text();
-                // title = data.children().first().text();
+            const url
+            const urlp1 = "http://grbbrodiga01.core.local:9150/preview/data/story?adapt=true&Uuid=";
+            const urlp2 = "&DbPath=/foobar&EmObjectType=EOM::WebPage&EmEnvironment=PROD";
+            const urljson = urlp1+myid+urlp2;
 
-                release = data.children().last().children().text();
+            request(urljson, function(error, response, html){
 
-                json.title = title;
-                json.release = release;
+                if(!error){
+                  //  const $ = cheerio.load(html);                    
+                }
+          //  my_result = $;
+            
+                fs.writeFile('output.js', urljson, function(err){
+
+                    console.log('File successfully written!');
+
+                })
             })
 
-            // Since the rating is in a different section of the DOM, we'll have to write a new jQuery filter to extract this information.
-
-            $('.star-box-giga-star').filter(function(){
-                var data = $(this);
-
-                // The .star-box-giga-star class was exactly where we wanted it to be.
-                // To get the rating, we can simply just get the .text(), no need to traverse the DOM any further
-
-                rating = data.text();
-
-                json.rating = rating;
-            })
-        */
         }
-
+/*
         fs.writeFile('output.js', my_result, function(err){
         //fs.writeFile('output.json', JSON.stringify(json, null, 4), function(err){
 
             console.log('File successfully written! - Check your project directory for the output.json file');
 
         })
-
+*/
         // Finally, we'll just send out a message to the browser reminding you that this app does not have a UI.
         res.send('Check your console!')
 
     })
 })
 
+app.use(basicAuth({
+    users: { 'snps04': 'password' }
+}))
+
 app.listen('8081')
 console.log('Magic happens on port 8081');
 exports = module.exports = app;
+
+
+////
+// https://<username>:<paswoord>@grbbrodiga01.core.local:9150/preview/data/story?adapt=true&Uuid=c28bc57a-ca54-11e7-92e4-9b28e8def83c&DbPath=/foobar&EmObjectType=EOM::WebPage&EmEnvironment=PROD
+
+////
